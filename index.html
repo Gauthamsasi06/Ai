@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRAFFIC PULSE - Real-Time Autonomous Grid Command & Analytics</title>
+  <!-- Tailwind CSS Engine -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <!-- Custom Cyber-Traffic Styling -->
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="bg-[#070a11] text-slate-100 min-h-screen flex flex-col p-3 md:p-6 antialiased">
+
+  <!-- TOP APP BAR -->
+  <header class="glass-panel px-4 py-3 mb-4 flex flex-wrap items-center justify-between gap-3 shadow-lg border border-slate-800">
+    <div class="flex items-center gap-3">
+      <!-- Traffic Light Icon Emblem -->
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 flex items-center justify-center shadow-inner">
+        <div class="flex flex-col gap-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_#ef4444]"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b]"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"></span>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base md:text-lg font-black tracking-wider uppercase bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
+            TRAFFIC PULSE
+          </h1>
+          <span class="px-2 py-0.5 text-[10px] font-mono font-bold tracking-wide rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+            AI COMMAND v3.8
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-400 font-medium">Real-Time Autonomous Corridor & Dynamic Signal Orchestration</p>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Status Badges -->
+    <div class="flex items-center flex-wrap gap-2.5">
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-xs">
+        <span class="live-beacon"></span>
+        <span class="text-[11px] font-mono font-semibold text-emerald-400">SIM 60 FPS</span>
+      </div>
+
+      <!-- Signals Current Phase Status -->
+      <div id="signal-ns-pill" class="font-mono text-xs px-2.5 py-1 rounded-full border border-emerald-500/50 bg-emerald-500/20 text-emerald-400">
+        N-S: GREEN (14s)
+      </div>
+      <div id="signal-ew-pill" class="font-mono text-xs px-2.5 py-1 rounded-full border border-rose-500/50 bg-rose-500/20 text-rose-400">
+        E-W: RED (14s)
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <button id="btn-emergency" class="btn-control !bg-rose-500/20 !border-rose-500/50 !text-rose-300 hover:!bg-rose-500/30 shadow-[0_0_12px_rgba(244,63,94,0.2)]">
+        🚨 Emergency Dispatch
+      </button>
+      <button id="btn-audio" class="btn-control">
+        🔇 Sound: OFF
+      </button>
+      <button id="btn-reset" class="btn-control">
+        🔄 Reset
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI TELEMETRY METRIC CARDS -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+    <!-- Card 1: Active Vehicles -->
+    <div class="glass-panel p-3 border-l-4 border-l-cyan-500">
+      <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <span>Active Grid Fleet</span>
+        <span>🚗</span>
+      </div>
+      <div class="flex items-baseline gap-1.5">
+        <span id="metric-vehicles" class="text-2xl font-black font-mono text-cyan-400 tracking-tight">0</span>
+        <span class="text-[11px] text-slate-500 font-mono">vehicles</span>
+      </div>
+    </div>
+
+    <!-- Card 2: Congestion Index -->
+    <div class="glass-panel p-3 border-l-4 border-l-amber-500">
+      <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <span>Congestion Index</span>
+        <span>🚦</span>
+      </div>
+      <div class="flex items-baseline gap-1.5">
+        <span id="metric-congestion" class="text-2xl font-black font-mono text-amber-400 tracking-tight">0%</span>
+        <span class="text-[11px] text-slate-500 font-mono">deficit</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Average Speed -->
+    <div class="glass-panel p-3 border-l-4 border-l-emerald-500">
+      <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <span>Mean Grid Velocity</span>
+        <span>⚡</span>
+      </div>
+      <div class="flex items-baseline gap-1.5">
+        <span id="metric-speed" class="text-2xl font-black font-mono text-emerald-400 tracking-tight">0.0 km/h</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Mean Wait Time -->
+    <div class="glass-panel p-3 border-l-4 border-l-purple-500">
+      <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <span>Avg Signal Delay</span>
+        <span>⏳</span>
+      </div>
+      <div class="flex items-baseline gap-1.5">
+        <span id="metric-delay" class="text-2xl font-black font-mono text-purple-400 tracking-tight">0.0s</span>
+        <span class="text-[11px] text-slate-500 font-mono">per car</span>
+      </div>
+    </div>
+
+    <!-- Card 5: Emission Rate -->
+    <div class="glass-panel p-3 border-l-4 border-l-rose-500">
+      <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <span>Carbon Intensity</span>
+        <span>🌱</span>
+      </div>
+      <div class="flex items-baseline gap-1.5">
+        <span id="metric-emissions" class="text-2xl font-black font-mono text-rose-400 tracking-tight">0.0 g/s</span>
+      </div>
+    </div>
+
+    <!-- Card 6: Throughput -->
+    <div class="glass-panel p-3 border-l-4 border-l-blue-500">
+      <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+        <span>Intersection Flow</span>
+        <span>🎯</span>
+      </div>
+      <div class="flex items-baseline gap-1.5">
+        <span id="metric-throughput" class="text-2xl font-black font-mono text-blue-400 tracking-tight">0 v/m</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SIMULATION VIEWER & CONTROL TOOLBAR -->
+  <div class="glass-panel p-3 mb-4 shadow-xl relative">
+    
+    <!-- Controls Toolbar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-800">
+      <!-- Left: Simulation Speed & Flow Controls -->
+      <div class="flex items-center flex-wrap gap-2">
+        <button id="btn-pause" class="btn-control">
+          ⏸ Pause
+        </button>
+
+        <!-- Speed multiplier group -->
+        <div class="flex items-center bg-slate-900/90 rounded-lg p-0.5 border border-slate-800">
+          <button class="speed-btn btn-control !bg-transparent !border-0 text-xs py-1 px-2" data-speed="0.5">0.5x</button>
+          <button class="speed-btn btn-control !bg-transparent !border-0 text-xs py-1 px-2 active" data-speed="1.0">1.0x</button>
+          <button class="speed-btn btn-control !bg-transparent !border-0 text-xs py-1 px-2" data-speed="2.0">2.0x</button>
+          <button class="speed-btn btn-control !bg-transparent !border-0 text-xs py-1 px-2" data-speed="4.0">4.0x</button>
+        </div>
+
+        <!-- Spawn Density Slider -->
+        <div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-900/80 border border-slate-800 text-xs">
+          <span class="text-slate-400">Spawn Flow:</span>
+          <input id="spawn-rate-slider" type="range" min="0.4" max="3.5" step="0.1" value="1.4" class="w-20 md:w-28">
+          <span id="spawn-rate-val" class="font-mono text-cyan-400 font-bold w-12">1.4 /s</span>
+        </div>
+      </div>
+
+      <!-- Right: Modes, Weather, and Hazard Injection -->
+      <div class="flex items-center flex-wrap gap-2">
+        <!-- Signal Mode -->
+        <div class="flex items-center gap-1.5 text-xs">
+          <span class="text-slate-400 hidden sm:inline">Signal AI:</span>
+          <select id="signal-mode-select" class="bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:border-cyan-500">
+            <option value="ADAPTIVE_AI">Adaptive AI Optimization</option>
+            <option value="FIXED_TIMER">Standard Fixed Cycles</option>
+            <option value="GREEN_WAVE">Green Wave Corridor</option>
+            <option value="MANUAL">Manual Operator Control</option>
+          </select>
+        </div>
+
+        <!-- Atmospheric Weather Toggle -->
+        <div class="flex items-center bg-slate-900/90 rounded-lg p-0.5 border border-slate-800 text-xs">
+          <button class="weather-btn btn-control !bg-transparent !border-0 text-xs py-1 px-2 active" data-weather="NIGHT">🌙 Night</button>
+          <button class="weather-btn btn-control !bg-transparent !border-0 text-xs py-1 px-2" data-weather="RAIN">🌧️ Rain</button>
+          <button class="weather-btn btn-control !bg-transparent !border-0 text-xs py-1 px-2" data-weather="DAY">☀️ Day</button>
+        </div>
+
+        <!-- Hazard Placement Toggle -->
+        <button id="btn-add-hazard" class="btn-control">
+          🚧 Place Road Hazard
+        </button>
+        <button id="btn-clear-hazards" class="btn-control !text-slate-400">
+          🧹 Clear Hazards
+        </button>
+        <button id="btn-force-signal" class="btn-control !border-emerald-500/40 !text-emerald-300">
+          ⚡ Flip Signal
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas Viewport -->
+    <div class="canvas-wrapper relative">
+      <canvas id="simulation-canvas" width="1200" height="700"></canvas>
+
+      <!-- Interactive Tooltip Overlay Instruction -->
+      <div class="absolute bottom-2 left-3 pointer-events-none text-[11px] font-mono text-slate-400/80 bg-slate-950/70 px-2.5 py-1 rounded border border-slate-800/80 flex items-center gap-3">
+        <span>💡 <b>Click Car:</b> Inspect Telemetry</span>
+        <span>|</span>
+        <span><b>Click Signal:</b> Manual Cycle</span>
+        <span>|</span>
+        <span><b>Click Road:</b> Place Hazard Cone</span>
+      </div>
+
+      <!-- Floating Vehicle Inspector Panel (hidden by default) -->
+      <div id="vehicle-inspector" class="glass-panel p-3.5 border border-cyan-500/40 shadow-2xl hidden">
+        <div class="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <span id="insp-id" class="font-mono font-bold text-sm text-cyan-400">V-1000</span>
+          </div>
+          <button id="close-inspector" class="text-slate-400 hover:text-white text-xs px-1.5 py-0.5 rounded hover:bg-slate-800">✕</button>
+        </div>
+        <div class="space-y-1.5 text-xs font-mono">
+          <div class="flex justify-between"><span class="text-slate-400">Model:</span><span id="insp-type" class="text-slate-200 font-semibold">Sedan</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Velocity:</span><span id="insp-speed" class="text-emerald-400 font-bold">42 km/h</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Driver State:</span><span id="insp-state" class="text-cyan-400">CRUISING</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Trajectory:</span><span id="insp-route" class="text-slate-300">N → STRAIGHT</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Signal Wait:</span><span id="insp-wait" class="text-amber-400 font-bold">0.0s</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">CO2 Output:</span><span id="insp-co2" class="text-rose-400 font-bold">0.00 g</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Eco Rating:</span><span id="insp-eco" class="text-emerald-400 font-bold">92/100</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS, CHARTS & INSIGHTS GRID -->
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
+    <!-- Chart 1: Real-Time Timeline (Speed & Congestion) -->
+    <div class="glass-panel p-3.5 lg:col-span-2">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-xs font-bold font-mono tracking-wider uppercase text-slate-300 flex items-center gap-2">
+          <span>📈</span> Velocity & Congestion Timeline (60s)
+        </h3>
+        <div class="flex items-center gap-3 text-[10px] font-mono">
+          <span class="flex items-center gap-1 text-cyan-400"><span class="w-2.5 h-0.5 bg-cyan-400"></span> Mean Speed</span>
+          <span class="flex items-center gap-1 text-amber-400"><span class="w-2.5 h-0.5 bg-amber-400"></span> Congestion %</span>
+        </div>
+      </div>
+      <div class="w-full h-44 relative">
+        <canvas id="timeline-chart" class="w-full h-full block"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Corridor Pressure & Queues -->
+    <div class="glass-panel p-3.5">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-xs font-bold font-mono tracking-wider uppercase text-slate-300 flex items-center gap-2">
+          <span>🚥</span> Corridor Density
+        </h3>
+        <span class="text-[10px] font-mono text-slate-500">Vol / Wait Queue</span>
+      </div>
+      <div class="w-full h-44 relative">
+        <canvas id="corridor-chart" class="w-full h-full block"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 3: Fleet Breakdown Donut & Speedometer -->
+    <div class="glass-panel p-3.5 flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-xs font-bold font-mono tracking-wider uppercase text-slate-300 flex items-center gap-2">
+          <span>🚙</span> Fleet Mix & Congestion Gauge
+        </h3>
+      </div>
+      <div class="grid grid-cols-2 gap-2 h-44">
+        <!-- Donut canvas -->
+        <div class="relative w-full h-full">
+          <canvas id="fleet-chart" class="w-full h-full block"></canvas>
+        </div>
+        <!-- Speedometer gauge canvas -->
+        <div class="relative w-full h-full">
+          <canvas id="congestion-gauge-chart" class="w-full h-full block"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM PANELS: AI ADVISORY & REAL-TIME EVENT LOGS -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <!-- Panel 1: AI Traffic Insights & Recommendations -->
+    <div class="glass-panel p-3.5">
+      <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
+        <h3 class="text-xs font-bold font-mono tracking-wider uppercase text-cyan-400 flex items-center gap-2">
+          <span>🤖</span> AI Traffic Orchestration Advisory
+        </h3>
+        <span class="text-[10px] font-mono text-slate-500">Autonomous Heuristic Feed</span>
+      </div>
+      <div id="recommendations-list" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+
+    <!-- Panel 2: Live Diagnostic Event Log -->
+    <div class="glass-panel p-3.5">
+      <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
+        <h3 class="text-xs font-bold font-mono tracking-wider uppercase text-slate-300 flex items-center gap-2">
+          <span>📡</span> Live Grid Telemetry Log
+        </h3>
+        <span class="text-[10px] font-mono text-slate-500">Stream Buffer</span>
+      </div>
+      <div id="insights-feed" class="space-y-1 max-h-56 overflow-y-auto pr-1 font-mono">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Scripts -->
+  <script src="./js/audio.js"></script>
+  <script src="./js/engine.js"></script>
+  <script src="./js/insights.js"></script>
+  <script src="./js/charts.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
